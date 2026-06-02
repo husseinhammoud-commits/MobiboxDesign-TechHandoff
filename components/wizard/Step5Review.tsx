@@ -40,7 +40,7 @@ function buildSections(
   if (offers.length === 0) offersIssues.push('No offers configured');
 
   const portalsIssues: string[] = [];
-  if (!step4.url.trim()) portalsIssues.push('Portal URL is required');
+  if (!step4.premiumEnabled && !step4.freemiumEnabled) portalsIssues.push('At least one portal URL is required');
 
   const uniqueCountries = new Set(
     offers.flatMap((o) => (o.countries ?? []).map((c) => c.countryCode)),
@@ -72,7 +72,11 @@ function buildSections(
     {
       title: 'Portals', stepIndex: 3, issues: portalsIssues,
       detail: portalsIssues.length === 0
-        ? `${step4.url}${paramCount > 0 ? ` · ${paramCount} parameter${paramCount !== 1 ? 's' : ''}` : ''}`
+        ? [
+            step4.premiumEnabled  && step4.premiumUrl  ? `Premium: ${step4.premiumUrl}`  : null,
+            step4.freemiumEnabled && step4.freemiumUrl ? `Freemium: ${step4.freemiumUrl}` : null,
+            paramCount > 0 ? `${paramCount} parameter${paramCount !== 1 ? 's' : ''}` : null,
+          ].filter(Boolean).join(' · ') || null
         : null,
     },
   ];

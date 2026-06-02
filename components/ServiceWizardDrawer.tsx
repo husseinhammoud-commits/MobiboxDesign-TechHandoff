@@ -33,10 +33,10 @@ export function ServiceWizardDrawer({ open, onClose }: ServiceWizardDrawerProps)
   const [step1, setStep1] = useState<Step1Values>({ name: '', client: '', category: '', premium: false });
   const [step2, setStep2] = useState<Step2Values>({
     countries: ['United Arab Emirates', 'Saudi Arabia'], defaultLang: 'English',
-    channelType: 'Double opt-in (MO/MT)', customThemes: false,
+    channelType: 'Double opt-in (MO/MT)', customThemes: false, heEnabled: true,
   });
   const [offers, setOffers]       = useState<OfferDraft[]>([]);
-  const [step4, setStep4]         = useState<Step4Values>({ country: '', operator: '', premium: false, url: '', parameters: [{ name: '', value: '' }] });
+  const [step4, setStep4]         = useState<Step4Values>({ country: '', operator: '', premiumEnabled: false, premiumUrl: '', freemiumEnabled: false, freemiumUrl: '', parameters: [{ name: '', value: '' }] });
   const [themingOfferId, setThemingOfferId] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
   const [themeChannel, setThemeChannel]       = useState<'otp' | 'voice'>('otp');
@@ -82,7 +82,7 @@ export function ServiceWizardDrawer({ open, onClose }: ServiceWizardDrawerProps)
   const resetState = () => {
     setStep(0);
     setStep1({ name: '', client: '', category: '', premium: false });
-    setStep2({ countries: ['United Arab Emirates', 'Saudi Arabia'], defaultLang: 'English', channelType: 'Double opt-in (MO/MT)', customThemes: false });
+    setStep2({ countries: ['United Arab Emirates', 'Saudi Arabia'], defaultLang: 'English', channelType: 'Double opt-in (MO/MT)', customThemes: false, heEnabled: true });
     setOffers([]);
     setThemingOfferId(null);
     setThemeEditorOpen(false);
@@ -153,6 +153,7 @@ export function ServiceWizardDrawer({ open, onClose }: ServiceWizardDrawerProps)
       case 2: return (
         <Step3Offers
           countries={step2.countries}
+          heEnabled={step2.heEnabled}
           offers={offers}
           onAddOffer={addOffer}
           onUpdateOffer={updateOffer}

@@ -17,6 +17,7 @@ export interface Step2Values {
   defaultLang:  string;
   channelType:  string;
   customThemes: boolean;
+  heEnabled:    boolean;
 }
 
 export interface Step2SetupProps {
@@ -114,9 +115,9 @@ function freshOperator(): OperatorForm {
     channelType: '', consentGateway: '', pinLength: '4 digits', resendTimer: '30 seconds',
     autofillPin: false, showResend: true, autoVerify: true, numericPin: true, consentCheckbox: true,
     pricingCurrency: 'USD',
-    daily:   { enabled: true, price: '0.50', otpIn: '', otpOut: '', keywords: freshKeywords() },
-    weekly:  { enabled: true, price: '2.00', otpIn: '', otpOut: '', keywords: freshKeywords() },
-    monthly: { enabled: true, price: '7.00', otpIn: '', otpOut: '', keywords: freshKeywords() },
+    daily:   { enabled: false, price: '0.50', otpIn: '', otpOut: '', keywords: freshKeywords() },
+    weekly:  { enabled: false, price: '2.00', otpIn: '', otpOut: '', keywords: freshKeywords() },
+    monthly: { enabled: false, price: '7.00', otpIn: '', otpOut: '', keywords: freshKeywords() },
     exceptionsEnabled: false,
     exceptions: [],
   };
@@ -154,8 +155,9 @@ export function Step2Setup({ values, onChange, themeEditorOpen = false, themeCha
   const handleUpdateCountry = (idx: number, k: keyof CountryForm, v: CountryForm[keyof CountryForm]) => {
     const next = countryForms.map((f, i) => i === idx ? { ...f, [k]: v } : f);
     setCountryForms(next);
-    if (k === 'country')                onChange('countries', next.map((f) => f.country).filter(Boolean));
+    if (k === 'country')    onChange('countries', next.map((f) => f.country).filter(Boolean));
     if (k === 'subscriptionFlow' && idx === 0) onChange('channelType', v as string);
+    if (k === 'headerEnrichment') onChange('heEnabled', next.some((f) => f.headerEnrichment));
   };
 
   const handleAddCountry = () => {
@@ -171,6 +173,7 @@ export function Step2Setup({ values, onChange, themeEditorOpen = false, themeCha
     const next = countryForms.filter((_, i) => i !== idx);
     setCountryForms(next);
     onChange('countries', next.map((f) => f.country).filter(Boolean));
+    onChange('heEnabled', next.some((f) => f.headerEnrichment));
   };
 
   const updateTheme = <K extends keyof ThemeForm>(k: K, v: ThemeForm[K]) => {
@@ -203,7 +206,7 @@ export function Step2Setup({ values, onChange, themeEditorOpen = false, themeCha
         />
       )}
       {tab === 'billing' && (
-        <BillingTabContent countryForms={countryForms} onBackTab={() => handleTabChange('country')} onNextTab={() => handleTabChange('theme')} />
+        <BillingTabContent countryForms={countryForms} onUpdateCountry={handleUpdateCountry} onBackTab={() => handleTabChange('country')} onNextTab={() => handleTabChange('theme')} />
       )}
       {tab === 'theme' && (
         <ThemeTabContent
@@ -458,12 +461,6 @@ function CountryAccordionItem({ form, expanded, onToggle, onUpdate, onRemove }: 
                 onChange={(e) => onUpdate('subscriptionFlow', e.target.value as string)}
               />
             </Box>
-            <ToggleRow
-              label="Header enrichment (HE)"
-              description="Carrier passes the subscriber's MSISDN in HTTP headers — enables one-tap subscribe. When on, billing is configured per operator in the Billing tab."
-              checked={form.headerEnrichment}
-              onChange={(v) => onUpdate('headerEnrichment', v)}
-            />
             <Select
               label="Operator firewall"
               options={FIREWALL_OPTS} value={form.operatorFirewall}
@@ -513,13 +510,18 @@ function CountryAccordionItem({ form, expanded, onToggle, onUpdate, onRemove }: 
 
 // ─── Billing tab ──────────────────────────────────────────────────────────────
 
-function BillingTabContent({ countryForms, onBackTab, onNextTab }: { countryForms: CountryForm[]; onBackTab: () => void; onNextTab: () => void }) {
+function BillingTabContent({ countryForms, onUpdateCountry, onBackTab, onNextTab }: {
+  countryForms:     CountryForm[];
+  onUpdateCountry:  (idx: number, k: keyof CountryForm, v: CountryForm[keyof CountryForm]) => void;
+  onBackTab:        () => void;
+  onNextTab:        () => void;
+}) {
   const [expandedIdx, setExpandedIdx] = useState(0);
-  const activeCountries = countryForms.filter((f) => f.country);
+  const hasCountries = countryForms.some((f) => f.country);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-      {activeCountries.length === 0 ? (
+      {!hasCountries ? (
         <Box sx={{
           borderRadius: '8px', border: (t) => `1px dashed ${t.palette.border.main}`,
           py: 4, textAlign: 'center',
@@ -529,11 +531,13 @@ function BillingTabContent({ countryForms, onBackTab, onNextTab }: { countryForm
           </Typography>
         </Box>
       ) : (
-        activeCountries.map((cf, idx) => (
+        countryForms.map((cf, idx) => !cf.country ? null : (
           <CountryBillingSection
             key={cf.country}
             countryName={cf.country}
             flag={COUNTRY_FLAG[cf.country] ?? '🌍'}
+            headerEnrichment={cf.headerEnrichment}
+            onUpdateHE={(v) => onUpdateCountry(idx, 'headerEnrichment', v)}
             expanded={expandedIdx === idx}
             onToggle={() => setExpandedIdx((i) => (i === idx ? -1 : idx))}
           />
@@ -551,8 +555,13 @@ function BillingTabContent({ countryForms, onBackTab, onNextTab }: { countryForm
   );
 }
 
-function CountryBillingSection({ countryName, flag, expanded, onToggle }: {
-  countryName: string; flag: string; expanded: boolean; onToggle: () => void;
+function CountryBillingSection({ countryName, flag, headerEnrichment, onUpdateHE, expanded, onToggle }: {
+  countryName:       string;
+  flag:              string;
+  headerEnrichment:  boolean;
+  onUpdateHE:        (v: boolean) => void;
+  expanded:          boolean;
+  onToggle:          () => void;
 }) {
   const [operators, setOperators] = useState<OperatorForm[]>([freshOperator()]);
   const [expandedOpIdx, setExpandedOpIdx] = useState(0);
@@ -598,6 +607,12 @@ function CountryBillingSection({ countryName, flag, expanded, onToggle }: {
       </Box>
       <Collapse in={expanded}>
         <Box sx={{ p: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          <ToggleRow
+            label="Header enrichment (HE)"
+            description="Carrier passes the subscriber's MSISDN in HTTP headers — enables one-tap subscribe."
+            checked={headerEnrichment}
+            onChange={onUpdateHE}
+          />
           {operators.map((op, idx) => (
             <OperatorAccordionItem
               key={idx}

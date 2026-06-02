@@ -41,9 +41,9 @@ export default function NewServiceWizardPage() {
 
   // Form state — each step's values live here so they survive step nav
   const [step1, setStep1] = useState<Step1Values>({ name: '', client: '', category: '', premium: false });
-  const [step2, setStep2] = useState<Step2Values>({ countries: ['UAE', 'KSA'], defaultLang: 'English', channelType: 'Direct carrier billing (DCB)', customThemes: false });
+  const [step2, setStep2] = useState<Step2Values>({ countries: ['UAE', 'KSA'], defaultLang: 'English', channelType: 'Direct carrier billing (DCB)', customThemes: false, heEnabled: false });
   const [offers, setOffers] = useState<OfferDraft[]>([]);
-  const [step4, setStep4] = useState<Step4Values>({ country: '', operator: '', premium: false, url: '', parameters: [{ name: '', value: '' }] });
+  const [step4, setStep4] = useState<Step4Values>({ country: '', operator: '', premiumEnabled: false, premiumUrl: '', freemiumEnabled: false, freemiumUrl: '', parameters: [{ name: '', value: '' }] });
 
   // Offer-theme takeover
   const [themingOfferId, setThemingOfferId] = useState<string | null>(null);

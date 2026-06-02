@@ -1,23 +1,21 @@
-/**
- * Step 4 — Portals. Configure the portal (URL + parameters) per
- * country/operator. The form mirrors the prototype's Step 4 design.
- */
-
 'use client';
 
 import { useState } from 'react';
 import Box from '@mui/material/Box';
+import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
-import { Asterisk, FileCode2 } from 'lucide-react';
+import { Check, FileCode2 } from 'lucide-react';
 
-import { Card, Input, Select, Switch, Button } from '../';
+import { Card, Input, Select, Button } from '../';
 
 export interface Step4Values {
-  country:     string;
-  operator:    string;
-  premium:     boolean;
-  url:         string;
-  parameters:  Array<{ name: string; value: string }>;
+  country:          string;
+  operator:         string;
+  premiumEnabled:   boolean;
+  premiumUrl:       string;
+  freemiumEnabled:  boolean;
+  freemiumUrl:      string;
+  parameters:       Array<{ name: string; value: string }>;
 }
 
 export interface Step4PortalsProps {
@@ -28,6 +26,50 @@ export interface Step4PortalsProps {
 const COUNTRY_OPTIONS  = ['UAE', 'KSA', 'Egypt', 'Kuwait'];
 const OPERATOR_OPTIONS = ['Etisalat', 'du', 'STC', 'Mobily', 'Zain', 'Ooredoo', 'Vodafone', 'Orange'];
 const VALUE_OPTIONS    = ['Static value', 'Dynamic from request', 'From offer config'];
+
+// ─── Checkbox-expandable URL section ─────────────────────────────────────────
+
+function PortalUrlSection({ label, enabled, url, onToggle, onUrlChange }: {
+  label:       string;
+  enabled:     boolean;
+  url:         string;
+  onToggle:    () => void;
+  onUrlChange: (v: string) => void;
+}) {
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}>
+      <Box
+        component="button"
+        type="button"
+        onClick={onToggle}
+        sx={{ all: 'unset', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 1 }}
+      >
+        <Box sx={{
+          width: 16, height: 16, borderRadius: '4px', flexShrink: 0,
+          border: '1.5px solid',
+          borderColor: enabled ? '#18181b' : '#d4d4d8',
+          backgroundColor: enabled ? '#18181b' : 'transparent',
+          display: 'grid', placeItems: 'center',
+          transition: 'all .1s',
+        }}>
+          {enabled && <Check size={10} color="#fff" strokeWidth={3} />}
+        </Box>
+        <Typography sx={{ fontSize: 13.5, fontWeight: 500, color: 'text.primary', userSelect: 'none' }}>
+          {label}
+        </Typography>
+      </Box>
+      <Collapse in={enabled}>
+        <Input
+          placeholder="https://example.com/subscribe"
+          value={url}
+          onChange={(e) => onUrlChange((e.target as HTMLInputElement).value)}
+        />
+      </Collapse>
+    </Box>
+  );
+}
+
+// ─── Step4Portals ─────────────────────────────────────────────────────────────
 
 export function Step4Portals({ values, onChange }: Step4PortalsProps) {
   const addParameter = () => onChange('parameters', [...values.parameters, { name: '', value: '' }]);
@@ -59,21 +101,25 @@ export function Step4Portals({ values, onChange }: Step4PortalsProps) {
             value={values.operator}
             onChange={(e) => onChange('operator', e.target.value as string)}
           />
-          <Switch
-            stacked
-            checked={values.premium}
-            onChange={(_e, v) => onChange('premium', v)}
-            label="Premium Portal"
-            description="Mark this portal as premium"
-          />
 
           <Box sx={{ borderTop: (t) => `1px solid ${t.palette.border.subtle}` }} />
 
-          <Input
-            label="Portal URL"
-            placeholder="https://example.com/subscribe"
-            value={values.url}
-            onChange={(e) => onChange('url', (e.target as HTMLInputElement).value)}
+          {/* Premium URL */}
+          <PortalUrlSection
+            label="Premium URL"
+            enabled={values.premiumEnabled}
+            url={values.premiumUrl}
+            onToggle={() => onChange('premiumEnabled', !values.premiumEnabled)}
+            onUrlChange={(v) => onChange('premiumUrl', v)}
+          />
+
+          {/* Freemium URL */}
+          <PortalUrlSection
+            label="Freemium URL"
+            enabled={values.freemiumEnabled}
+            url={values.freemiumUrl}
+            onToggle={() => onChange('freemiumEnabled', !values.freemiumEnabled)}
+            onUrlChange={(v) => onChange('freemiumUrl', v)}
           />
 
           <Box sx={{ borderTop: (t) => `1px solid ${t.palette.border.subtle}` }} />
