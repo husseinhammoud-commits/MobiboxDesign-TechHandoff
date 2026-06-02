@@ -1,0 +1,24 @@
+/* [project]/tech-handoff/app/globals.css [app-client] (css) */
+html, body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #fafafa;
+  margin: 0;
+  padding: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+*, :before, :after {
+  box-sizing: border-box;
+}
+
+:focus {
+  outline: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/*# sourceMappingURL=tech-handoff_app_globals_0g-ox.s.css.map*/

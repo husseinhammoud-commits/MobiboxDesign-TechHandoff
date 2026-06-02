@@ -1,0 +1,8 @@
+{
+  "/(shell)/dashboard/page": "/dashboard",
+  "/(shell)/services/new/page": "/services/new",
+  "/(shell)/services/page": "/services",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/page": "/"
+}

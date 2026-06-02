@@ -1,0 +1,3 @@
+module.exports=[55081,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(34498);a.n(d("[project]/tech-handoff/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},37306,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(34498);a.n(d("[project]/tech-handoff/node_modules/next/dist/client/components/builtin/global-error.js"))},35932,a=>{"use strict";a.i(55081);var b=a.i(37306);a.n(b)},86082,a=>{a.n(a.i(35932))}];
+
+//# sourceMappingURL=0q19_next_dist_client_components_builtin_global-error_115rql7.js.map

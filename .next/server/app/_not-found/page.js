@@ -1,0 +1,12 @@
+var R=require("../../chunks/ssr/[turbopack]_runtime.js")("server/app/_not-found/page.js")
+R.c("server/chunks/ssr/[root-of-the-server]__0w0qu58._.js")
+R.c("server/chunks/ssr/0q19_next_dist_esm_build_templates_app-page_100dwa-.js")
+R.c("server/chunks/ssr/[root-of-the-server]__0yix42a._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__0~zq1i6._.js")
+R.c("server/chunks/ssr/tech-handoff_app_00nke8-._.js")
+R.c("server/chunks/ssr/0q19_next_dist_client_components_0rgiqb7._.js")
+R.c("server/chunks/ssr/0q19_next_dist_client_components_builtin_forbidden_0ruml8b.js")
+R.c("server/chunks/ssr/0q19_next_dist_client_components_builtin_unauthorized_02xn-aw.js")
+R.c("server/chunks/ssr/tech-handoff__next-internal_server_app__not-found_page_actions_0bkfdo1.js")
+R.m(672)
+module.exports=R.m(672).exports
