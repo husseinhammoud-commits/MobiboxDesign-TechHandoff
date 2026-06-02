@@ -7,6 +7,7 @@ import { theme } from '@/tech-handoff/theme';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
+    // `AppRouterCacheProvider` is required for Next 16 App Router + Emotion SSR
     <AppRouterCacheProvider options={{ enableCssLayer: true }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
